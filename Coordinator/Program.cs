@@ -21,7 +21,7 @@ app.MapPost("/files/allocate", ([FromQuery] string fileName, [FromQuery] int blo
 
     for (int i = 0; i < blockCount; i++)
     {
-        string blockId = Guid.NewGuid().ToString();
+        string blockId = Guid.NewGuid().ToString() + $"#{i}";
 
         // Round-robin selection of storage nodes
         string targetNode = StorageNodes[i % StorageNodes.Count];
