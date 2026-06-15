@@ -43,19 +43,23 @@ async Task RetrieveFileAsync(string dfsFileName, string storePath)
     // ask coordinator for block IDs associated with file
     var response = await httpClient.GetAsync($"{CoordinatorUrl}/files/lookup?fileName={dfsFileName}");
     var planJson = await response.Content.ReadAsStringAsync();
-    var blockIds = JsonSerializer.Deserialize<string[]>(planJson, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-    if (blockIds is null)
+    var blocks = JsonSerializer.Deserialize<BlockAssignment[]>(planJson, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+    if (blocks is null)
     {
-        Console.WriteLine("Failed to retrieve block IDs");
+        Console.WriteLine("Failed to retrieve blocks");
         return;
     }
 
-    const string ReadDataNodeUrl = "http://localhost:5001";
-    // Retrieve data from nodes
-    for (int i = 0; i < blockIds.Length; i++)
+    foreach (var block in blocks)
     {
-        var filePath = Path.Combine(storePath, blockIds[i]);
-        using var downloadStream = await httpClient.GetStreamAsync($"{ReadDataNodeUrl}/blocks/{blockIds[i]}");
+        Console.WriteLine(block);
+    }
+
+    // Retrieve data from nodes
+    for (int i = 0; i < blocks.Length; i++)
+    {
+        var filePath = Path.Combine(storePath, blocks[i].BlockId);
+        using var downloadStream = await httpClient.GetStreamAsync($"{blocks[i].NodeUrl}/blocks/{blocks[i].BlockId}");
         using var fileStream = File.Create(filePath);
         await downloadStream.CopyToAsync(fileStream);
     }
@@ -67,6 +71,8 @@ const string DfsFileName = "output.txt";
 const string StorePath = "C:/Users/Jeffery.Snyder/Documents/output";
 
 await UploadFileAsync(LocalPath, DfsFileName);
+
+Thread.Sleep(2000);
 
 await RetrieveFileAsync(DfsFileName, StorePath);
 public record BlockAssignment(string BlockId, string NodeUrl);

@@ -38,8 +38,13 @@ app.MapPost("/files/allocate", ([FromQuery] string fileName, [FromQuery] int blo
 // Lookup layout for reading an existing file
 app.MapGet("/files/lookup", ([FromQuery] string fileName) =>
 {
-    if (!FileMetadata.TryGetValue(fileName, out var blocks)) return Results.NotFound();
-    return Results.Ok(blocks); // Returns the ordered list of blocks to fetch
+    if (!FileMetadata.TryGetValue(fileName, out var blockIds)) return Results.NotFound();
+    var retrievedBlocks = new List<BlockAssignment>();
+    for (int i = 0; i < blockIds.Count; i++)
+    {
+        retrievedBlocks.Add(new BlockAssignment(blockIds[i], StorageNodes[i % 2]));
+    }
+    return Results.Ok(retrievedBlocks); // Returns the ordered list of blocks to fetch
 });
 
 app.Run("http://localhost:5000");
