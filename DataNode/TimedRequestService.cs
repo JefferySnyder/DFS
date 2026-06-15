@@ -20,22 +20,11 @@ public class TimedRequestService : BackgroundService
         // Wait for the server to fully start up
         //await Task.Delay(5000, stoppingToken);
 
-        for (int i = 1; i <= _sharedState.StorageNodes.Capacity; i++) 
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+
+        while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            string node = "http://localhost:500" + i;
-            try
-            {
-                var response = await _httpClient.GetAsync(node + "/ping");
-            }
-            catch (HttpRequestException)
-            {
-                _sharedState.StorageNodes.Remove(node);
-                return;
-            }
-            if (!_sharedState.StorageNodes.Contains(node))
-            {
-                _sharedState.StorageNodes.Add(node);
-            }
+            await _httpClient.GetAsync($"http://localhost:5000/ping/{_sharedState.Port}", stoppingToken);
         }
     }
 }

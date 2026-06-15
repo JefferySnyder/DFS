@@ -6,6 +6,9 @@ using System.IO;
 void CreateNode(int port)
 {
     var builder = WebApplication.CreateBuilder(args);
+    builder.Services.AddHttpClient();
+    builder.Services.AddSingleton(new SharedState(port));
+    builder.Services.AddHostedService<TimedRequestService>();
     var app = builder.Build();
 
     // Ensure the local block directory exists
@@ -31,12 +34,10 @@ void CreateNode(int port)
         return Results.Bytes(bytes, "application/octet-stream");
     });
 
-    app.MapGet("/ping", () => Results.Ok());
-
     app.RunAsync($"http://localhost:{port}"); // Run other nodes on 5002, 5003, etc.
 }
 
-const int NODE_COUNT = 2;
+const int NODE_COUNT = 3;
 
 for (int i = 1; i <= NODE_COUNT; i++)
 {
