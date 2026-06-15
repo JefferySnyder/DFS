@@ -55,20 +55,19 @@ async Task RetrieveFileAsync(string dfsFileName, string storePath)
         Console.WriteLine(block);
     }
 
+    using var fileStream = File.Create(storePath);
     // Retrieve data from nodes
     for (int i = 0; i < blocks.Length; i++)
     {
-        var filePath = Path.Combine(storePath, blocks[i].BlockId);
         using var downloadStream = await httpClient.GetStreamAsync($"{blocks[i].NodeUrl}/blocks/{blocks[i].BlockId}");
-        using var fileStream = File.Create(filePath);
         await downloadStream.CopyToAsync(fileStream);
     }
-    Console.WriteLine("Distributed donwload complete.");
+    Console.WriteLine("Distributed download complete.");
 }
 
 const string LocalPath = "C:/Users/Jeffery.Snyder/Documents/output.txt";
 const string DfsFileName = "output.txt";
-const string StorePath = "C:/Users/Jeffery.Snyder/Documents/output";
+const string StorePath = "C:/Users/Jeffery.Snyder/Documents/output/" + DfsFileName;
 
 await UploadFileAsync(LocalPath, DfsFileName);
 
