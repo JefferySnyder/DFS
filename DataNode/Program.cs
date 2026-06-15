@@ -6,6 +6,9 @@ using System.IO;
 void CreateNode(int port)
 {
     var builder = WebApplication.CreateBuilder(args);
+    builder.Services.AddHttpClient();
+    builder.Services.AddSingleton(new TimedRequestSettings([port.ToString()]));
+    builder.Services.AddHostedService<TimedRequestService>();
     var app = builder.Build();
 
     // Ensure the local block directory exists

@@ -10,7 +10,7 @@ var app = builder.Build();
 var FileMetadata = new Dictionary<string, List<string>>();
 
 // List of available active storage nodes
-var StorageNodes = new List<string> { "http://localhost:5001", "http://localhost:5002" };
+var StorageNodes = new List<string>();
 
 // Request allocation layout for a new file
 app.MapPost("/files/allocate", ([FromQuery] string fileName, [FromQuery] int blockCount) =>
@@ -45,6 +45,18 @@ app.MapGet("/files/lookup", ([FromQuery] string fileName) =>
         retrievedBlocks.Add(new BlockAssignment(blockIds[i], StorageNodes[i % 2]));
     }
     return Results.Ok(retrievedBlocks); // Returns the ordered list of blocks to fetch
+});
+
+// Get heartbeat indicator from DataNodes
+app.MapGet("/ping/{port}", (int port) =>
+{
+    var node = "http://localhost:" + port;
+    if (!StorageNodes.Contains(node))
+    {
+        StorageNodes.Add(node);
+        Console.WriteLine(node + " added to Node list");
+    }
+    return Results.Ok(node);
 });
 
 app.Run("http://localhost:5000");
