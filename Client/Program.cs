@@ -50,11 +50,6 @@ async Task RetrieveFileAsync(string dfsFileName, string storePath)
         return;
     }
 
-    foreach (var block in blocks)
-    {
-        Console.WriteLine(block);
-    }
-
     using var fileStream = File.Create(storePath);
     // Retrieve data from nodes
     for (int i = 0; i < blocks.Length; i++)

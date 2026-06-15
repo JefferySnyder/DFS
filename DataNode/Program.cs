@@ -6,9 +6,6 @@ using System.IO;
 void CreateNode(int port)
 {
     var builder = WebApplication.CreateBuilder(args);
-    builder.Services.AddHttpClient();
-    builder.Services.AddSingleton(new TimedRequestSettings([port.ToString()]));
-    builder.Services.AddHostedService<TimedRequestService>();
     var app = builder.Build();
 
     // Ensure the local block directory exists
@@ -33,6 +30,8 @@ void CreateNode(int port)
         var bytes = await File.ReadAllBytesAsync(filePath);
         return Results.Bytes(bytes, "application/octet-stream");
     });
+
+    app.MapGet("/ping", () => Results.Ok());
 
     app.RunAsync($"http://localhost:{port}"); // Run other nodes on 5002, 5003, etc.
 }

@@ -1,6 +1,6 @@
 $projects = @(
-	"C:\Users\Jeffery.Snyder\source\others\DFS\Coordinator\Coordinator.csproj"
 	"C:\Users\Jeffery.Snyder\source\others\DFS\DataNode\DataNode.csproj"
+	"C:\Users\Jeffery.Snyder\source\others\DFS\Coordinator\Coordinator.csproj"
 	"C:\Users\Jeffery.Snyder\source\others\DFS\Client\Client.csproj"
 )
 
